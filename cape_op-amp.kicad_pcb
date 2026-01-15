@@ -3097,7 +3097,7 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "CAPE Physics\nUnit 2 Workshop\nOperational Amplifiers\nUWI Mona"
+	(gr_text "CAPE Physics\nUnit 2 Workshop\nOperational Amplifiers\nUWI Mona\nhttps://github.com/irpl/cape_op-amp"
 		(at 85 117.5 0)
 		(layer "F.SilkS")
 		(uuid "0b30bdc2-74bb-4e1e-9f5d-856dedff305e")
