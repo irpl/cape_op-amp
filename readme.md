@@ -19,7 +19,7 @@ The op-amp is configured as an inverting amplifier with:
 - Closed-loop gain defined by:
 
 $$
-𝐴𝑣 = −\frac{𝑅_𝑓}{𝑅_{𝑖}}
+𝐴_{0} = −\frac{𝑅_𝑓}{𝑅_{𝑖}}
 $$
 
 By choosing different resistor values, users can easily experiment with different gain magnitudes while observing the effect on the output signal.
