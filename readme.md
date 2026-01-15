@@ -1,5 +1,8 @@
 # Inverting Op-Amp Amplifier – Schematic & PCB
 
+![alt text](image.png)
+![alt text](image-1.png)
+
 ## Overview
 
 This repository contains the schematic and PCB design for an inverting operational amplifier (op-amp) experiment board.
