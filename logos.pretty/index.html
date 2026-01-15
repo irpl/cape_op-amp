@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Sine Wave</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    canvas {
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 800px;
+      max-width: 100%;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .value {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #333;
+      outline: none;
+      border-radius: 3px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: white;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: white;
+      cursor: pointer;
+      border-radius: 50%;
+      border: none;
+    }
+
+    .export-btn {
+      padding: 12px 24px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .export-btn:hover {
+      background: #ddd;
+    }
+
+    .export-btn:active {
+      background: #bbb;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>
+        <span>Amplitude</span>
+        <span class="value" id="ampValue">100</span>
+      </label>
+      <input type="range" id="amplitude" min="10" max="180" value="100" step="1">
+    </div>
+
+    <div class="control-group">
+      <label>
+        <span>Line Thickness</span>
+        <span class="value" id="thickValue">2</span>
+      </label>
+      <input type="range" id="thickness" min="1" max="10" value="2" step="0.5">
+    </div>
+
+    <div class="control-group">
+      <label>
+        <span>Frequency</span>
+        <span class="value" id="freqValue">2</span>
+      </label>
+      <input type="range" id="frequency" min="0.5" max="10" value="2" step="0.1">
+    </div>
+
+    <div class="control-group">
+      <label>
+        <span>Phase (rad)</span>
+        <span class="value" id="phaseValue">0</span>
+      </label>
+      <input type="range" id="phase" min="0" max="6.28" value="0" step="0.1">
+    </div>
+  </div>
+
+  <div class="button-group">
+    <button class="export-btn" id="exportPngBtn">Export PNG</button>
+    <button class="export-btn" id="exportSvgBtn">Export SVG</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Get controls
+    const ampSlider = document.getElementById('amplitude');
+    const thickSlider = document.getElementById('thickness');
+    const freqSlider = document.getElementById('frequency');
+    const phaseSlider = document.getElementById('phase');
+
+    const ampValue = document.getElementById('ampValue');
+    const thickValue = document.getElementById('thickValue');
+    const freqValue = document.getElementById('freqValue');
+    const phaseValue = document.getElementById('phaseValue');
+
+    const exportPngBtn = document.getElementById('exportPngBtn');
+    const exportSvgBtn = document.getElementById('exportSvgBtn');
+
+    let amplitude = parseFloat(ampSlider.value);
+    let thickness = parseFloat(thickSlider.value);
+    let frequency = parseFloat(freqSlider.value);
+    let phase = parseFloat(phaseSlider.value);
+
+    // Export PNG functionality
+    exportPngBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'sine-wave.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+
+    // Export SVG functionality
+    exportSvgBtn.addEventListener('click', () => {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Create SVG content
+      let svgContent = `<svg width="${canvas.width}" height="${canvas.height}" xmlns="http://www.w3.org/2000/svg">`;
+      svgContent += `<rect width="${canvas.width}" height="${canvas.height}" fill="black"/>`;
+
+      // X-axis
+      svgContent += `<line x1="0" y1="${centerY}" x2="${canvas.width}" y2="${centerY}" stroke="white" stroke-width="1"/>`;
+
+      // Y-axis
+      svgContent += `<line x1="${centerX}" y1="0" x2="${centerX}" y2="${canvas.height}" stroke="white" stroke-width="1"/>`;
+
+      // Generate sine wave path
+      let pathData = '';
+      for (let x = 0; x < canvas.width; x++) {
+        const mathX = (x - centerX) / 50;
+        const mathY = amplitude * Math.sin(frequency * mathX + phase);
+        const canvasY = centerY - mathY;
+
+        if (x === 0) {
+          pathData += `M ${x} ${canvasY} `;
+        } else {
+          pathData += `L ${x} ${canvasY} `;
+        }
+      }
+
+      svgContent += `<path d="${pathData}" stroke="white" stroke-width="${thickness}" fill="none"/>`;
+      svgContent += `</svg>`;
+
+      // Download SVG
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = 'sine-wave.svg';
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Update values
+    ampSlider.addEventListener('input', (e) => {
+      amplitude = parseFloat(e.target.value);
+      ampValue.textContent = amplitude;
+      draw();
+    });
+
+    thickSlider.addEventListener('input', (e) => {
+      thickness = parseFloat(e.target.value);
+      thickValue.textContent = thickness;
+      draw();
+    });
+
+    freqSlider.addEventListener('input', (e) => {
+      frequency = parseFloat(e.target.value);
+      freqValue.textContent = frequency;
+      draw();
+    });
+
+    phaseSlider.addEventListener('input', (e) => {
+      phase = parseFloat(e.target.value);
+      phaseValue.textContent = phase.toFixed(2);
+      draw();
+    });
+
+    function draw() {
+      // Clear canvas
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      // Draw axes
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1;
+
+      // X-axis
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(canvas.width, centerY);
+      ctx.stroke();
+
+      // Y-axis
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, canvas.height);
+      ctx.stroke();
+
+      // Draw sine wave
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = thickness;
+      ctx.beginPath();
+
+      for (let x = 0; x < canvas.width; x++) {
+        // Convert pixel x to mathematical x (centered at origin)
+        const mathX = (x - centerX) / 50; // Scale factor for visual appeal
+
+        // Calculate y using sine function: y = A * sin(f * x + phase)
+        const mathY = amplitude * Math.sin(frequency * mathX + phase);
+
+        // Convert mathematical y back to canvas y (inverted)
+        const canvasY = centerY - mathY;
+
+        if (x === 0) {
+          ctx.moveTo(x, canvasY);
+        } else {
+          ctx.lineTo(x, canvasY);
+        }
+      }
+
+      ctx.stroke();
+    }
+
+    // Initial draw
+    draw();
+  </script>
+</body>
+
+</html>
